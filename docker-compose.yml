@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    ports:
+      - "${PG_PORT}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      # persistent database files (local dev)
+      - ims_pg_data:/var/lib/postgresql/data
+      # run schema files on first boot
+      - ./infra/db/init:/docker-entrypoint-initdb.d:ro
+
+  adminer:
+    image: adminer:4
+    restart: unless-stopped
+    depends_on:
+      - db
+    ports:
+      - "${ADMINER_PORT}:8080"
+
+volumes:
+  ims_pg_data:
