@@ -1,0 +1,17 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+.env
+*.env
+
+.git
+.gitignore
+
+fly.toml
+docker-compose.yml
+*.sqlite3
+
+# Ignore OS files
+.DS_Store
