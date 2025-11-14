@@ -6,15 +6,14 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y gcc libpq-dev --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Disable passlib bcrypt wrap-bug testing
 ENV PASSLIB_BCRYPT_NO_CHECK=1
 
-# Install Python deps
+# Copy only the requirements
 COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-# Copy entire project
-COPY . /app
+# Copy ONLY the app folder
+COPY app /app/app
 
 EXPOSE 8080
 
