@@ -1,12 +1,8 @@
 fastapi
-uvicorn[standard]
+uvicorn
 SQLAlchemy
 psycopg2-binary
 python-dotenv
-passlib[bcrypt]
-python-jose[cryptography]
-pydantic>=2.0
-pydantic-settings>=2.0
+bcrypt==4.1.2
+passlib[bcrypt]==1.7.4
 python-multipart
-bcrypt==4.0.2
-passlib[bcrypt]
