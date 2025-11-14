@@ -2,18 +2,16 @@
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
-    database_url: str
+    DATABASE_URL: str   # required
+
+    POSTGRES_USER: str | None = None
+    POSTGRES_PASSWORD: str | None = None
+    POSTGRES_DB: str | None = None
+    POSTGRES_HOST: str | None = None
+    POSTGRES_PORT: str | None = None
 
     class Config:
         env_file = ".env"
+        extra = "allow"
 
 settings = Settings()
-
-# app/database.py
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
-from app.core.config import settings
-
-engine = create_engine(settings.database_url)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
