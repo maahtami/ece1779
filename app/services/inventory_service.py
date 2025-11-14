@@ -1,33 +1,23 @@
+# app/services/inventory_service.py
 from sqlalchemy.orm import Session
-
+from fastapi import HTTPException
 from app.models.item import Item
-from app.core.config import settings
+from app.services.notifications import notify_low_stock
 
+def adjust_stock(db: Session, item_id: int, delta: int) -> Item:
+    item = db.query(Item).get(item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
 
-def recalc_low_stock(item: Item) -> None:
-    threshold = item.low_stock_threshold or settings.LOW_STOCK_THRESHOLD
-    item.is_low_stock = item.quantity <= threshold
+    new_qty = item.quantity + delta
+    if new_qty < 0:
+        raise HTTPException(status_code=400, detail="Insufficient stock")
 
-
-def create_item(db: Session, name: str, description: str | None, quantity: int, low_stock_threshold: int) -> Item:
-    item = Item(
-        name=name,
-        description=description,
-        quantity=quantity,
-        low_stock_threshold=low_stock_threshold,
-    )
-    recalc_low_stock(item)
-    db.add(item)
+    item.quantity = new_qty
     db.commit()
     db.refresh(item)
-    return item
 
+    if item.quantity <= item.low_stock_threshold:
+        notify_low_stock(item)  # hook for real-time + notification
 
-def update_item(db: Session, item: Item, **fields) -> Item:
-    for key, value in fields.items():
-        if value is not None:
-            setattr(item, key, value)
-    recalc_low_stock(item)
-    db.commit()
-    db.refresh(item)
     return item
