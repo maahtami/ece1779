@@ -5,7 +5,7 @@ from app.db.database import get_db
 from app.models.user import User
 from app.schemas.user import UserCreate, UserOut
 from app.core.security import hash_password
-from app.routers.dependencies import get_current_manager_user
+from app.routers.dependencies import get_current_manager
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -14,7 +14,7 @@ router = APIRouter(prefix="/users", tags=["Users"])
 def create_user(
     user_in: UserCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_manager_user),
+    current_user: User = Depends(get_current_manager),
 ):
     existing = db.query(User).filter(User.username == user_in.username).first()
     if existing:
@@ -33,6 +33,6 @@ def create_user(
 @router.get("/", response_model=list[UserOut])
 def list_users(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_manager_user),
+    current_user: User = Depends(get_current_manager),
 ):
     return db.query(User).all()
