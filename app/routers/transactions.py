@@ -7,12 +7,13 @@ from app.models.transaction import Transaction
 from app.schemas.transaction import TransactionCreate, TransactionOut
 from app.routers.dependencies import get_current_user
 from app.services.transaction_service import apply_stock_change, InsufficientStockError
+from app.services.websocket_manager import manager
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
 
 @router.post("/", response_model=TransactionOut)
-def create_transaction(
+async def create_transaction(
     tx_in: TransactionCreate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -22,7 +23,7 @@ def create_transaction(
         raise HTTPException(status_code=404, detail="Item not found")
 
     try:
-        tx = apply_stock_change(
+        tx, is_low_stock = apply_stock_change(
             db=db,
             item=item,
             type=tx_in.type,
@@ -31,11 +32,47 @@ def create_transaction(
         )
     except InsufficientStockError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+    
+    # Broadcast transaction creation
+    await manager.broadcast({
+        "type": "transaction_created",
+        "data": {
+            "id": tx.id,
+            "item_id": tx.item_id,
+            "type": tx.type.value,
+            "quantity": tx.quantity,
+        }
+    })
+    
+    # Also broadcast item update since stock changed
+    await manager.broadcast({
+        "type": "item_updated",
+        "data": {
+            "id": item.id,
+            "name": item.name,
+            "quantity": item.quantity
+        }
+    })
+
+    # Broadcast low stock alert if needed
+    if is_low_stock:
+        await manager.broadcast({
+            "type": "low_stock_alert",
+            "data": {
+                "item_id": item.id,
+                "name": item.name,
+                "quantity": item.quantity,
+                "sku": item.sku,
+                "threshold": item.low_stock_threshold,
+                "message": f"⚠️ Low stock alert: {item.name} has only {item.quantity} left!"
+            }
+        })
+    
     return tx
 
 
 @router.get("/", response_model=list[TransactionOut])
-def list_transactions(
+async def list_transactions(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
