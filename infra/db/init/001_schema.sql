@@ -1,9 +1,11 @@
 -- users
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
+  username VARCHAR(100) UNIQUE NOT NULL,
   email VARCHAR(255) UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
+  hashed_password TEXT NOT NULL,
+  full_name VARCHAR(100),
+  is_active BOOLEAN DEFAULT TRUE,
   role VARCHAR(20) NOT NULL DEFAULT 'staff' CHECK (role IN ('manager','staff')),
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -12,27 +14,29 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS items (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100) NOT NULL,
-  category VARCHAR(50),
+  description TEXT,
+  sku VARCHAR(100) UNIQUE NOT NULL,
   quantity INTEGER NOT NULL DEFAULT 0,
-  min_threshold INTEGER NOT NULL DEFAULT 0,
-  location VARCHAR(100),
+  low_stock_threshold INTEGER NOT NULL DEFAULT 5,
+  price FLOAT NOT NULL DEFAULT 0.0,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- transactions
 CREATE TABLE IF NOT EXISTS transactions (
   id SERIAL PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   item_id INTEGER NOT NULL REFERENCES items(id) ON DELETE CASCADE,
-  user_id INTEGER REFERENCES users(id) ON DELETE SET NULL,
-  change_amount INTEGER NOT NULL,
-  note TEXT,
-  timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  quantity INTEGER NOT NULL,
+  type VARCHAR(20) NOT NULL CHECK (type IN ('IN', 'OUT')),
+  created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- helpful indexes
 CREATE INDEX IF NOT EXISTS idx_items_name ON items (name);
-CREATE INDEX IF NOT EXISTS idx_items_category ON items (category);
-CREATE INDEX IF NOT EXISTS idx_transactions_item_id_timestamp ON transactions (item_id, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_items_sku ON items (sku);
+CREATE INDEX IF NOT EXISTS idx_transactions_item_id ON transactions (item_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions (user_id);
 
 -- update updated_at automatically
 CREATE OR REPLACE FUNCTION set_updated_at()

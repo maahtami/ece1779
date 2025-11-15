@@ -5,6 +5,7 @@ from app.database import SessionLocal
 from app.schemas.item import ItemCreate, ItemUpdate, ItemRead
 from app.models.item import Item
 from app.routers.dependencies import get_current_staff_or_manager
+from app.services.websocket_manager import manager
 
 router = APIRouter(prefix="/items", tags=["items"])
 
@@ -16,7 +17,7 @@ def get_db():
         db.close()
 
 @router.post("/", response_model=ItemRead)
-def create_item(
+async def create_item(
     item_in: ItemCreate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_staff_or_manager),
@@ -28,17 +29,22 @@ def create_item(
     db.add(item)
     db.commit()
     db.refresh(item)
+    # Broadcast item creation
+    await manager.broadcast({
+        "type": "item_created",
+        "data": {"id": item.id, "name": item.name, "sku": item.sku}
+    })
     return item
 
 @router.get("/", response_model=list[ItemRead])
-def list_items(
+async def list_items(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_staff_or_manager),
 ):
     return db.query(Item).all()
 
 @router.get("/{item_id}", response_model=ItemRead)
-def get_item(
+async def get_item(
     item_id: int,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_staff_or_manager),
@@ -49,7 +55,7 @@ def get_item(
     return item
 
 @router.put("/{item_id}", response_model=ItemRead)
-def update_item(
+async def update_item(
     item_id: int,
     item_in: ItemUpdate,
     db: Session = Depends(get_db),
@@ -62,10 +68,15 @@ def update_item(
         setattr(item, field, value)
     db.commit()
     db.refresh(item)
+    # Broadcast item update
+    await manager.broadcast({
+        "type": "item_updated",
+        "data": {"id": item.id, "name": item.name, "quantity": item.quantity}
+    })
     return item
 
 @router.delete("/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_item(
+async def delete_item(
     item_id: int,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_staff_or_manager),
@@ -75,3 +86,8 @@ def delete_item(
         raise HTTPException(status_code=404, detail="Item not found")
     db.delete(item)
     db.commit()
+    # Broadcast item deletion
+    await manager.broadcast({
+        "type": "item_deleted",
+        "data": {"id": item_id}
+    })
