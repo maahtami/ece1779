@@ -24,7 +24,7 @@ services:
 
   api:
     build:
-      context: .
+      context: ./app
       dockerfile: Dockerfile
     restart: unless-stopped
     ports:
