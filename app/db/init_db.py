@@ -19,8 +19,8 @@ def init_db():
         manager_exists = db.query(User).filter(User.role == UserRole.manager).first()
         if not manager_exists:
             # Try to create from environment variables (for Fly.io deployment)
-            admin_username = os.getenv("ADMIN_USERNAME", "manager")
-            admin_password = os.getenv("ADMIN_PASSWORD", "managerpass123")
+            admin_username = os.getenv("ADMIN_USERNAME")
+            admin_password = os.getenv("ADMIN_PASSWORD")
             
             if admin_username and admin_password:
                 user = User(

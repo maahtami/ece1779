@@ -1,9 +1,9 @@
 services:
   db:
-    image: postgres:16
+    image: postgres:latest
     restart: unless-stopped
     ports:
-      - "${PG_PORT}:5432"
+      - "5432:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -13,6 +13,14 @@ services:
       - ims_pg_data:/var/lib/postgresql/data
       # run schema files on first boot
       - ./infra/db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - app-network
 
   api:
     build:
@@ -28,9 +36,13 @@ services:
       SERVERLESS_EMAIL_URL: ${SERVERLESS_EMAIL_URL}
       EMAIL_API_KEY: ${EMAIL_API_KEY}
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+        restart: true
     volumes:
       - ./app:/app/app
+    networks:
+      - app-network
 
   frontend:
     build:
@@ -45,6 +57,12 @@ services:
       REACT_APP_API_URL: ${REACT_APP_API_URL}
     depends_on:
       - api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   ims_pg_data:
