@@ -15,7 +15,8 @@ jobs:
       - name: Install Fly.io CLI
         run: |
           curl -L https://fly.io/install.sh | sh
-          export PATH=$HOME/.fly/bin:$PATH
+          echo "Adding Fly.io CLI to PATH"
+          echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
       - name: Deploy Backend
         run: fly deploy
@@ -31,7 +32,8 @@ jobs:
       - name: Install Fly.io CLI
         run: |
           curl -L https://fly.io/install.sh | sh
-          export PATH=$HOME/.fly/bin:$PATH
+          echo "Adding Fly.io CLI to PATH"
+          echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
       - name: Change to Frontend Directory
         run: cd ./frontend
