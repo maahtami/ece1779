@@ -8,6 +8,7 @@ from app.schemas.transaction import TransactionCreate, TransactionOut
 from app.routers.dependencies import get_current_user
 from app.services.transaction_service import apply_stock_change, InsufficientStockError
 from app.services.websocket_manager import manager
+import requests, os
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
@@ -67,6 +68,14 @@ async def create_transaction(
                 "message": f"⚠️ Low stock alert: {item.name} has only {item.quantity} left!"
             }
         })
+        # use serverless integration to send email notifications
+        response = requests.post(os.environ.get('SERVERLESS_EMAIL_URL'), 
+                      headers={"Authorization": f"Bearer {os.environ.get('EMAIL_API_KEY')}", "Content-Type": "application/json"},
+                      json={"subject": f"Low Stock Alert - {item.name}",
+                            "text": f"⚠️ Low stock alert: {item.name} has only {item.quantity} left!"}
+        )
+        print(f"INFO: Email API Response Status: {response.status_code}")
+        print(f"INFO: Email API Response Body: {response.text}")
     
     return tx
 
