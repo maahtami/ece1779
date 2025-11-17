@@ -40,18 +40,12 @@ jobs:
           echo "Adding Fly.io CLI to PATH"
           echo "$HOME/.fly/bin" >> $GITHUB_PATH
 
-      - name: Authenticate with Fly.io
+      - name: Change to Frontend Directory
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_FRONTEND }}
-        run: flyctl auth token
-
-      - name: Change to Frontend Directory
         run: cd ./frontend
 
-      - name: Authenticate with Fly.io
+      - name: Deploy Frontend
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_FRONTEND }}
-        run: flyctl auth token
-
-      - name: Deploy Frontend
         run: fly deploy
