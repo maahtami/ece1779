@@ -31,8 +31,10 @@ services:
       - "8000:8080"
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
-      ADMIN_USERNAME: ${ADMIN_USERNAME:-manager}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-managerpass123}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      SERVERLESS_EMAIL_URL: ${SERVERLESS_EMAIL_URL}
+      EMAIL_API_KEY: ${EMAIL_API_KEY}
     depends_on:
       - db
     volumes:
@@ -43,12 +45,12 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_API_URL: "http://localhost:8000"
+        REACT_APP_API_URL: ${REACT_APP_API_URL}
     restart: unless-stopped
     ports:
       - "3000:3000"
     environment:
-      REACT_APP_API_URL: http://localhost:8000
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
     depends_on:
       - api
 

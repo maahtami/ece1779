@@ -69,11 +69,13 @@ async def create_transaction(
             }
         })
         # use serverless integration to send email notifications
-        requests.post(os.environ.get('SERVERLESS_EMAIL_URL'), 
+        response = requests.post(os.environ.get('SERVERLESS_EMAIL_URL'), 
                       headers={"Authorization": f"Bearer {os.environ.get('EMAIL_API_KEY')}", "Content-Type": "application/json"},
                       json={"subject": f"Low Stock Alert - {item.name}",
-                            "body": f"⚠️ Low stock alert: {item.name} has only {item.quantity} left!"}
+                            "text": f"⚠️ Low stock alert: {item.name} has only {item.quantity} left!"}
         )
+        print(f"INFO: Email API Response Status: {response.status_code}")
+        print(f"INFO: Email API Response Body: {response.text}")
     
     return tx
 
