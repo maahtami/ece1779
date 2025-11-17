@@ -35,17 +35,15 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install Fly.io CLI
-        run: |
-          curl -L https://fly.io/install.sh | sh
-          echo "Adding Fly.io CLI to PATH"
-          echo "$HOME/.fly/bin" >> $GITHUB_PATH
+        uses: superfly/flyctl-actions/setup-flyctl@master
 
-      - name: Change to Frontend Directory
+      - name: Deploy Backend
         env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_FRONTEND }}
-        run: cd ./frontend
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_BACKEND }}
+        run: 
+          flyctl deploy --remote-only
 
       - name: Deploy Frontend
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_FRONTEND }}
-        run: fly deploy
+        run: cd ./frontend && flyctl deploy --remote-only
