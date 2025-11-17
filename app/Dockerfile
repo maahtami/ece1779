@@ -13,7 +13,7 @@ COPY requirements.txt /app/requirements.txt
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
 # Copy ONLY the app folder
-COPY app /app/app
+COPY . /app/app
 
 EXPOSE 8080
 
