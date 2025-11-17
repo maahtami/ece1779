@@ -54,6 +54,6 @@ def apply_stock_change(
     db.refresh(tx)
 
     # Check low stock
-    is_low_stock = item.quantity < item.low_stock_threshold
+    is_low_stock = item.quantity <= item.low_stock_threshold
 
     return tx, is_low_stock

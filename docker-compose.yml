@@ -14,14 +14,6 @@ services:
       # run schema files on first boot
       - ./infra/db/init:/docker-entrypoint-initdb.d:ro
 
-  adminer:
-    image: adminer:4
-    restart: unless-stopped
-    depends_on:
-      - db
-    ports:
-      - "${ADMINER_PORT}:8080"
-
   api:
     build:
       context: .
