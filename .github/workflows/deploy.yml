@@ -48,5 +48,10 @@ jobs:
       - name: Change to Frontend Directory
         run: cd ./frontend
 
+      - name: Authenticate with Fly.io
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_FRONTEND }}
+        run: flyctl auth token
+
       - name: Deploy Frontend
         run: fly deploy
