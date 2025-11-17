@@ -1,0 +1,40 @@
+name: Deploy to Fly.io
+
+on:
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  deploy-backend:
+    name: Deploy Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Fly.io CLI
+        run: |
+          curl -L https://fly.io/install.sh | sh
+          export PATH=$HOME/.fly/bin:$PATH
+
+      - name: Deploy Backend
+        run: fly deploy
+
+  deploy-frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Fly.io CLI
+        run: |
+          curl -L https://fly.io/install.sh | sh
+          export PATH=$HOME/.fly/bin:$PATH
+
+      - name: Change to Frontend Directory
+        run: cd ./frontend
+
+      - name: Deploy Frontend
+        run: fly deploy
