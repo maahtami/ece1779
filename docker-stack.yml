@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # ----------------------------
+  # DATABASE SERVICE (CONSTRAINED TO MANAGER)
+  # ----------------------------
+  db:
+    image: tksdock/ece1779:ims-db-v1.0 
+    env_file:
+      - .env
+    volumes:
+      # CRITICAL: This 'bind' mount structure is used to link the container's 
+      # internal data path to a specific directory on the host Droplet.
+      # That directory (source: /mnt/imsdbdata) MUST be the mount point 
+      # for the externally attached DigitalOcean Block Storage Volume.
+      - type: bind
+        source: /mnt/imsdbdata # <--- ASSUMED MOUNT POINT OF DO VOLUME
+        target: /var/lib/postgresql/data # <--- PostgreSQL's internal data path
+
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        # CRITICAL: Constrain the database to the MANAGER Droplet's hostname 
+        # because the DigitalOcean Volume is attached ONLY to that machine.
+        constraints:
+          - node.hostname == ims-swarm-manager
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ims_user -d ims"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------------
+  # BACKEND API SERVICE
+  # ----------------------------
+  api:
+    image: tksdock/ece1779:ims-backend-v1.0
+    ports:
+      - "8000:8080"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      - db
+    deploy:
+      replicas: 2
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+  # ----------------------------
+  # FRONTEND SERVICE
+  # ----------------------------
+  frontend:
+    image: tksdock/ece1779:ims-frontend-cloud-v1.0
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    deploy:
+      replicas: 2
+
+networks:
+  app-network:
+    driver: overlay
+
+# The local 'volumes' block is removed entirely since we are using a 'bind' mount.

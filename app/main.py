@@ -9,7 +9,8 @@ app = FastAPI(title="IMS Inventory API")
 # Enable CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8000"],
+    #allow_origins=["http://localhost:3000", "http://localhost:8000", "http://159.203.33.61:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
