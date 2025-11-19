@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # -----------------
+  # DATABASE SERVICE 
+  # -----------------
+  db:
+    image: tksdock/ece1779:ims-db-v1.0  # <--- USING THE CUSTOM IMAGE
+    env_file:
+      - .env
+    volumes:
+      # Persistent data storage (Still needed for run-time data)
+      - ims_sw_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ims_user -d ims"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # --------------------
+  # BACKEND API SERVICE
+  # --------------------
+  api:
+    image: tksdock/ece1779:ims-backend-v1.0
+    ports:
+      - "8000:8080"
+    env_file:
+      - .env
+    networks:
+      - app-network
+    depends_on:
+      - db
+    deploy:
+      replicas: 1
+      update_config:
+        parallelism: 1
+        delay: 10s
+
+  # -----------------
+  # FRONTEND SERVICE
+  # -----------------
+  frontend:
+    image: tksdock/ece1779:ims-frontend-v1.0
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    deploy:
+      replicas: 1
+
+networks:
+  app-network:
+    driver: overlay
+
+volumes:
+  ims_sw_data:
