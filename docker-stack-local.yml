@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  # ----------------------------
+  # -----------------
   # DATABASE SERVICE 
-  # ----------------------------
+  # -----------------
   db:
     image: tksdock/ece1779:ims-db-v1.0  # <--- USING THE CUSTOM IMAGE
     env_file:
@@ -23,9 +23,9 @@ services:
       timeout: 5s
       retries: 5
 
-  # ----------------------------
+  # --------------------
   # BACKEND API SERVICE
-  # ----------------------------
+  # --------------------
   api:
     image: tksdock/ece1779:ims-backend-v1.0
     ports:
@@ -42,9 +42,9 @@ services:
         parallelism: 1
         delay: 10s
 
-  # ----------------------------
+  # -----------------
   # FRONTEND SERVICE
-  # ----------------------------
+  # -----------------
   frontend:
     image: tksdock/ece1779:ims-frontend-v1.0
     ports:
@@ -60,5 +60,3 @@ networks:
 
 volumes:
   ims_sw_data:
-
-# The 'configs' section is removed entirely!

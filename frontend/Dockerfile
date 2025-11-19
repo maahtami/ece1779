@@ -13,7 +13,6 @@ COPY . .
 # Allow passing the API base URL at build time so create-react-app
 # substitutes `process.env.REACT_APP_API_URL` into the static build.
 ARG REACT_APP_API_URL
-ENV REACT_APP_API_URL=${REACT_APP_API_URL:-https://ims-inventory-f25-final.fly.dev/}
 
 RUN npm run build
 

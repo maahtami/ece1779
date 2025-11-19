@@ -1,22 +1,21 @@
 version: '3.8'
 
 services:
-  # ----------------------------
+  # ------------------------------------------
   # DATABASE SERVICE (CONSTRAINED TO MANAGER)
-  # ----------------------------
+  # ------------------------------------------
   db:
     image: tksdock/ece1779:ims-db-v1.0 
     env_file:
       - .env
     volumes:
-      # CRITICAL: This 'bind' mount structure is used to link the container's 
+      # This 'bind' mount structure is used to link the container's 
       # internal data path to a specific directory on the host Droplet.
       # That directory (source: /mnt/imsdbdata) MUST be the mount point 
-      # for the externally attached DigitalOcean Block Storage Volume.
+      # for the externally attached DigitalOcean volume.
       - type: bind
         source: /mnt/imsdbdata # <--- ASSUMED MOUNT POINT OF DO VOLUME
         target: /var/lib/postgresql/data # <--- PostgreSQL's internal data path
-
     networks:
       - app-network
     deploy:
@@ -24,7 +23,7 @@ services:
       restart_policy:
         condition: on-failure
       placement:
-        # CRITICAL: Constrain the database to the MANAGER Droplet's hostname 
+        # Constrain the database to the MANAGER Droplet's hostname 
         # because the DigitalOcean Volume is attached ONLY to that machine.
         constraints:
           - node.hostname == ims-swarm-manager
@@ -34,9 +33,9 @@ services:
       timeout: 5s
       retries: 5
 
-  # ----------------------------
+  # --------------------
   # BACKEND API SERVICE
-  # ----------------------------
+  # --------------------
   api:
     image: tksdock/ece1779:ims-backend-v1.0
     ports:
@@ -48,22 +47,24 @@ services:
     depends_on:
       - db
     deploy:
-      replicas: 2
+      replicas: 3
       update_config:
         parallelism: 1
         delay: 10s
 
-  # ----------------------------
+  # -----------------
   # FRONTEND SERVICE
-  # ----------------------------
+  # -----------------
   frontend:
+    # The following image is built to point to the cloud API URL instead of localhost
+    # docker build -t ims-frontend:cloud-v1 --build-arg REACT_APP_API_URL=http://159.203.33.61:8000 ./frontend
     image: tksdock/ece1779:ims-frontend-cloud-v1.0
     ports:
       - "3000:3000"
     networks:
       - app-network
     deploy:
-      replicas: 2
+      replicas: 3
 
 networks:
   app-network:

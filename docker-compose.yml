@@ -49,12 +49,12 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
+        # Pass the API URL build argument to the Docker build
+        # docker build -t ims-frontend:v1 --build-arg REACT_APP_API_URL=http://localhost:8000 ./frontend
         REACT_APP_API_URL: ${REACT_APP_API_URL}
     restart: unless-stopped
     ports:
       - "3000:3000"
-    environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL}
     depends_on:
       - api
     networks:
