@@ -344,6 +344,117 @@ CREATE TABLE transactions (
 }
 ```
 
+### System Health Routes (`/health`) - Manager Only
+
+| Method | Endpoint | Description | Auth Required | Role |
+|--------|----------|-------------|----------------|------|
+| GET | `/health/system-metrics` | Get droplet metrics and service logs | Yes | manager |
+| GET | `/health/droplet-metrics` | Get DigitalOcean droplet metrics | Yes | manager |
+| GET | `/health/service-logs/{service_name}` | Get logs from specific Docker service | Yes | manager |
+
+**System Metrics Response:**
+```json
+{
+  "timestamp": "2024-11-19T10:30:00.000000",
+  "droplets": [
+    {
+      "droplet_id": 12345,
+      "name": "ims-droplet",
+      "status": "active",
+      "memory_mb": 1024,
+      "vcpus": 1,
+      "disk_gb": 25,
+      "cpu_usage": 45.2,
+      "disk_read_bytes": 1024000,
+      "disk_write_bytes": 2048000
+    }
+  ],
+  "services": ["ims_stack_api", "ims_stack_db", "ims_stack_frontend"],
+  "service_logs": {
+    "ims_stack_api": ["log line 1", "log line 2"],
+    "ims_stack_db": ["log line 1"],
+    "ims_stack_frontend": ["log line 1", "log line 2", "log line 3"]
+  }
+}
+```
+
+---
+
+## System Health Dashboard
+
+### Overview
+
+The **System Health Dashboard** is a manager-only feature that provides real-time monitoring of:
+
+1. **DigitalOcean Droplet Metrics**
+   - CPU usage percentage
+   - Memory allocation (in GB)
+   - Disk space (in GB)
+   - Disk I/O (read/write bytes)
+   - Droplet status
+
+2. **Docker Service Logs**
+   - Real-time logs from `ims_stack_api`, `ims_stack_db`, and `ims_stack_frontend`
+   - Last 50-100 lines of logs
+   - Service-specific log viewer
+   - Aggregated service logs summary
+
+### Features
+
+- **Auto-refresh**: Configurable polling interval (5s, 10s, 30s, 60s)
+- **Real-time updates**: Near real-time metrics and logs
+- **Responsive design**: Works on desktop and mobile
+- **Color-coded status**: Visual indicators for CPU usage and droplet status
+- **Log viewer**: Terminal-style interface with syntax highlighting
+- **Error handling**: Graceful error display and recovery
+
+### Setup Instructions
+
+#### 1. Configure DigitalOcean API Token
+
+1. Create a DigitalOcean API token:
+   - Visit https://cloud.digitalocean.com/account/api/tokens
+   - Click "Generate New Token"
+   - Give it a name (e.g., "IMS Health Monitoring")
+   - Select scopes: `read` for monitoring access
+   - Copy the token
+
+2. Add to `.env` file:
+   ```env
+   DIGITALOCEAN_TOKEN=dop_v1_your_token_here
+   DIGITALOCEAN_DROPLET_IDS=12345,67890  # Optional: specific droplet IDs
+   ```
+
+3. If `DIGITALOCEAN_DROPLET_IDS` is empty, the system will monitor the first available droplet.
+
+#### 2. Enable Docker Metrics
+
+The system automatically aggregates logs from Docker services running in:
+- **Swarm Mode**: Uses `docker service logs` command
+- **Compose Mode**: Uses `docker logs` command (fallback)
+
+Ensure Docker daemon is accessible from the API container.
+
+#### 3. Access the Dashboard
+
+- Navigate to `/health` path (only visible to managers)
+- Or click "🏥 Health" in the Navbar (manager-only link)
+- Available at: `http://localhost:3000/health`
+
+### Architecture
+
+**Backend** (`app/routers/health.py`):
+- `HealthMetrics` class manages all metric fetching
+- Integrates with DigitalOcean API via `requests` library
+- Executes Docker commands via `subprocess`
+- Implements manager-only access control
+
+**Frontend** (`frontend/src/pages/SystemHealth.js`):
+- React component with polling mechanism
+- Real-time metric visualization
+- Interactive log viewer
+- Configurable refresh intervals
+
 ---
 
 ## Business Logic & Workflows
@@ -484,6 +595,13 @@ ADMIN_PASSWORD=admin123
 # Email Service
 SERVERLESS_EMAIL_URL=https://your-serverless-function-url.fly.dev/send-email
 EMAIL_API_KEY=your-api-key
+
+# DigitalOcean Metrics (for System Health Dashboard)
+# DIGITALOCEAN_TOKEN is your DigitalOcean API token from https://cloud.digitalocean.com/account/api/tokens
+# DIGITALOCEAN_DROPLET_IDS is a comma-separated list of droplet IDs to monitor (e.g., "12345,67890")
+# Leave empty to auto-detect first available droplet
+DIGITALOCEAN_TOKEN=your-digitalocean-api-token
+DIGITALOCEAN_DROPLET_IDS=droplet_id_1,droplet_id_2
 ```
 
 ### Frontend (.env)

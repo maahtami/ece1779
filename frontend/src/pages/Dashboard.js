@@ -32,7 +32,16 @@ function Dashboard() {
                 <div className="card-title">👥 User Management</div>
                 <p>Create and manage staff accounts</p>
               </div>
-            </Link>
+            </Link> 
+          )}
+
+          {user?.role === 'manager' && (
+            <Link to="/health" style={{ textDecoration: 'none' }}>
+              <div className="card" style={{ cursor: 'pointer', transition: 'transform 0.2s' }}>
+                <div className="card-title">🏥 System Health Dashboard</div>
+                <p>View application health, server status, and droplet metrics</p>
+              </div>
+            </Link> 
           )}
         </div>
       </div>
