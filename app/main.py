@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.db.init_db import init_db
-from app.routers import auth, users, inventory, transactions, ws
+from app.routers import auth, users, inventory, transactions, ws, health
 
 app = FastAPI(title="IMS Inventory API")
 
@@ -33,4 +33,4 @@ app.include_router(users.router)
 app.include_router(inventory.router)
 app.include_router(transactions.router)
 app.include_router(ws.router)
-app.include_router(ws.router)
+app.include_router(health.router)

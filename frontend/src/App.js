@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Users from './pages/Users';
 import Items from './pages/Items';
 import Transactions from './pages/Transactions';
+import SystemHealth from './pages/SystemHealth';
 import './styles/App.css';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
               <Route path="/users" element={<Users />} />
               <Route path="/items" element={<Items />} />
               <Route path="/transactions" element={<Transactions />} />
+              <Route path="/health" element={<SystemHealth />} />
               <Route path="*" element={<Navigate to="/dashboard" />} />
             </>
           )}

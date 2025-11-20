@@ -24,7 +24,10 @@ function Navbar() {
           <Link to="/items" className="nav-link">Items</Link>
           <Link to="/transactions" className="nav-link">Transactions</Link>
           {user?.role === 'manager' && (
-            <Link to="/users" className="nav-link">Users</Link>
+            <>
+              <Link to="/users" className="nav-link">Users</Link>
+              <Link to="/health" className="nav-link">Health</Link>
+            </>
           )}
         </div>
 

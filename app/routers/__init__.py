@@ -1,1 +1,1 @@
-from app.routers import auth, users, inventory, transactions  # noqa
+from app.routers import auth, users, inventory, transactions, health  # noqa

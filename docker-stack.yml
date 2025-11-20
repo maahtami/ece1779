@@ -40,6 +40,9 @@ services:
     image: tksdock/ece1779:ims-backend-v1.0
     ports:
       - "8000:8080"
+    volumes:
+      # This maps the host's Docker socket into the container
+      - /var/run/docker.sock:/var/run/docker.sock
     env_file:
       - .env
     networks:
