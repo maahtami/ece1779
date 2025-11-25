@@ -4,16 +4,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: SSH and Deploy
-    runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u peterthegreat1992 --password-stdin
+
+      - name: Build and push ims-db image
+        run: |
+          docker build -t ims-db:v1 ./infra/db
+          docker tag ims-db:v1 tksdock/ece1779:ims-db-v1.0
+          docker push tksdock/ece1779:ims-db-v1.0
+
+      - name: Build and push ims-backend image
+        run: |
+          docker build -t ims-backend:v1 ./app
+          docker tag ims-backend:v1 tksdock/ece1779:ims-backend-v1.0
+          docker push tksdock/ece1779:ims-backend-v1.0
+
+      - name: Build and push ims-frontend image
+        run: |
+          docker build -t ims-frontend:cloud-v1 --build-arg REACT_APP_API_URL=http://159.203.33.61:8000 ./frontend
+          docker tag ims-frontend:cloud-v1 tksdock/ece1779:ims-frontend-cloud-v1.0
+          docker push tksdock/ece1779:ims-frontend-cloud-v1.0
+
+      - name: Print SSH key (debug)
+        run: |
+          echo "$DEPLOY_KEY"
+        env:
+          DEPLOY_KEY: ${{ secrets.deploy_key }}
+
       - name: SSH into manager node and deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: 159.203.33.61
           username: root
-          key: ${{ secrets.DEPLOY_KEY }}
+          key: ${{ secrets.deploy_key }}
           script: |
             cd ece1779
             docker stack deploy -c docker-stack.yml ims_stack
