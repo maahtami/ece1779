@@ -8,17 +8,12 @@ jobs:
     name: SSH and Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Print SSH key (debug)
-        env:
-          DEPLOY_KEY: ${{ secrets.deploy_key }}
-        run: |
-          echo "$DEPLOY_KEY"
       - name: SSH into manager node and deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
           host: 159.203.33.61
           username: root
-          key: ${{ secrets.deploy_key }}
+          key: ${{ secrets.DEPLOY_KEY }}
           script: |
             cd ece1779
             docker stack deploy -c docker-stack.yml ims_stack
