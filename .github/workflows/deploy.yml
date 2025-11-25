@@ -8,6 +8,11 @@ jobs:
     name: SSH and Deploy
     runs-on: ubuntu-latest
     steps:
+      - name: Print SSH key (debug)
+        env:
+          DEPLOY_KEY: ${{ secrets.deploy_key }}
+        run: |
+          echo "$DEPLOY_KEY"
       - name: SSH into manager node and deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
