@@ -50,7 +50,12 @@ services:
     depends_on:
       - db
     deploy:
-      replicas: 3
+      replicas: 1
+      placement:
+        # Constrain the database to the MANAGER Droplet's hostname 
+        # because the docker socket is only available on that machine for log trace in health dashboard.
+        constraints:
+          - node.hostname == ims-swarm-manager
       update_config:
         parallelism: 1
         delay: 10s
