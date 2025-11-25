@@ -1,19 +1,19 @@
 name: Deploy to DigitalOcean Swarm
 
 on:
-	workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-	deploy:
-		name: SSH and Deploy
-		runs-on: ubuntu-latest
-		steps:
-			- name: SSH into manager node and deploy
-				uses: appleboy/ssh-action@v0.1.10
-				with:
-					host: 159.203.33.61
-					username: root
-					key: ${{ secrets.deploy_key }}
-					script: |
+  deploy:
+    name: SSH and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: SSH into manager node and deploy
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: 159.203.33.61
+          username: root
+          key: ${{ secrets.deploy_key }}
+          script: |
             cd ece1779
-						docker stack deploy -c docker-stack.yml ims_stack
+            docker stack deploy -c docker-stack.yml ims_stack
