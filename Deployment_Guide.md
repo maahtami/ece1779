@@ -35,7 +35,7 @@ The build argument is necessary here to point the frontend to the local API endp
 
 | Action          | Command                                                                                                                     |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **Build & Run** | `docker compose build --build-arg REACT_APP_API_URL=http://127.0.0.1:8000`<br>`docker compose up -d`                        |
+| **Build & Run** | `docker compose build --build-arg REACT_APP_API_URL=http://localhost:8000`<br>`docker compose up -d`                        |
 | **Access**      | Frontend: [http://localhost:3000](http://localhost:3000)<br>API: [http://localhost:8000](http://localhost:8000)             |
 | **Cleanup**     | `docker compose down` (stops containers)<br>`docker compose down -v` (stops containers and removes persistent local volume) |
 
@@ -166,5 +166,91 @@ cd ece1779
 | ----------------- | ---------------------------------------------------------------------------------------- |
 | **Remove Stack**  | `docker stack rm ims_stack`                                                              |
 | **Drain Manager** | `docker node update --availability drain ims-swarm-manager` *(Optional for maintenance)* |
+
+---
+
+## 5. Serverless Function Deployment (DigitalOcean Functions)
+
+This section covers deploying the email notification serverless function to DigitalOcean Functions.
+
+---
+
+### 5.1. Prerequisites
+
+Ensure the `.env` file is present in the `serverless` directory with the following variables:
+
+```
+SENDGRID_API_KEY=...
+API_KEY=...
+SENDER_EMAIL=...
+TO_EMAIL=...
+```
+
+**Note:** The `project.yml` file references these environment variables.
+
+---
+
+### 5.2. Installation and Setup
+
+#### **Install `doctl` CLI**
+
+Follow the official DigitalOcean instructions to install `doctl` for your operating system:
+[https://docs.digitalocean.com/reference/doctl/how-to/install/](https://docs.digitalocean.com/reference/doctl/how-to/install/)
+
+#### **Generate API Token**
+
+1. Log in to your DigitalOcean account.
+2. Navigate to **API** → **Tokens/Keys** → **Generate New Token**.
+3. Select **Functions** scope and generate the token.
+4. Copy the token for the next step.
+
+#### **Authenticate `doctl`**
+
+```bash
+doctl auth init
+```
+
+Enter the API token when prompted.
+
+---
+
+### 5.3. Install Dependencies
+
+Navigate to the function directory and install the required Node.js packages:
+
+```bash
+cd serverless/packages/serverless-fn/send-email/
+npm install @sendgrid/mail
+cd ../../../../
+```
+
+---
+
+### 5.4. Deploy the Function
+
+Deploy the serverless function from the repository root:
+
+```bash
+doctl serverless deploy serverless
+```
+
+---
+
+### 5.5. Verify Deployment
+
+After deployment, `doctl` will output the function URL. You can test it using:
+
+```bash
+curl -X POST <FUNCTION_URL> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <API_KEY>" \
+  -d '{
+    "subject": "Test Email",
+    "text": "This is a test email.",
+    "html": "<p>This is a <b>test</b> email.</p>"
+  }'
+```
+
+Replace `<FUNCTION_URL>` with the deployed function URL and `<API_KEY>` with your `API_KEY` from the `.env` file.
 
 ---

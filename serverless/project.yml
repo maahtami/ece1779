@@ -1,0 +1,23 @@
+parameters: {}
+environment: {}
+packages:
+    - name: serverless-fn
+      shared: false
+      environment: {}
+      parameters: {}
+      annotations: {}
+      functions:
+        - name: send-email
+          binary: false
+          main: ""
+          runtime: nodejs:18
+          web: true
+          webSecure: false
+          parameters: {}
+          environment:
+            SENDGRID_API_KEY: ${SENDGRID_API_KEY}
+            API_KEY: ${API_KEY}
+            SENDER_EMAIL: ${SENDER_EMAIL}
+            TO_EMAIL: ${TO_EMAIL}
+          annotations: {}
+          limits: {}
