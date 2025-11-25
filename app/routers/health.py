@@ -111,8 +111,8 @@ class HealthMetrics:
         
         # Define the time window (required by DO Monitoring API)
         current_timestamp = int(datetime.now().timestamp())
-        end_time = current_timestamp - 10 # secs ago
-        start_time = end_time - 80 # secs ago
+        end_time = current_timestamp - 20 # secs ago
+        start_time = end_time - 100 # secs ago
         
         params = {
             "host_id": droplet_id, 
