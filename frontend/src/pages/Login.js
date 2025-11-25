@@ -35,7 +35,7 @@ function Login() {
     <div className="container" style={{ marginTop: '60px' }}>
       <div className="page" style={{ maxWidth: '400px', margin: '0 auto' }}>
         <h1 className="page-title" style={{ textAlign: 'center' }}>
-          IMS Login
+          Test deployment login
         </h1>
 
         {error && <div className="alert alert-error">{error}</div>}
