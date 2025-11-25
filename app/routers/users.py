@@ -21,6 +21,7 @@ def create_user(
         raise HTTPException(status_code=400, detail="Username already taken")
     user = User(
         username=user_in.username,
+        email=f"{user_in.username}@ims.local",
         hashed_password=hash_password(user_in.password),
         role=user_in.role,
     )
