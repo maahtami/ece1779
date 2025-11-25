@@ -1,51 +1,19 @@
-name: Deploy to Fly.io
+name: Deploy to DigitalOcean Swarm
 
 on:
-  workflow_dispatch: # Manual trigger only
+	workflow_dispatch:
 
 jobs:
-  deploy-backend:
-    name: Deploy Backend
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Fly.io CLI
-        run: |
-          curl -L https://fly.io/install.sh | sh
-          echo "Adding Fly.io CLI to PATH"
-          echo "$HOME/.fly/bin" >> $GITHUB_PATH
-
-      - name: Authenticate with Fly.io
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_BACKEND }}
-        run: flyctl auth token
-
-      - name: Deploy Backend
-        run: fly deploy
-
-  deploy-frontend:
-    name: Deploy Frontend
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Fly.io CLI
-        run: |
-          curl -L https://fly.io/install.sh | sh
-          echo "Adding Fly.io CLI to PATH"
-          echo "$HOME/.fly/bin" >> $GITHUB_PATH
-
-      - name: Change to Frontend Directory
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_FRONTEND }}
-        run: cd ./frontend
-
-      - name: Deploy Frontend
-        env:
-          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN_FRONTEND }}
-        run: fly deploy
+	deploy:
+		name: SSH and Deploy
+		runs-on: ubuntu-latest
+		steps:
+			- name: SSH into manager node and deploy
+				uses: appleboy/ssh-action@v0.1.10
+				with:
+					host: 159.203.33.61
+					username: root
+					key: ${{ secrets.deploy_key }}
+					script: |
+            cd ece1779
+						docker stack deploy -c docker-stack.yml ims_stack
