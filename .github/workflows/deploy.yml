@@ -31,12 +31,6 @@ jobs:
           docker tag ims-frontend:cloud-v1 tksdock/ece1779:ims-frontend-cloud-v1.0
           docker push tksdock/ece1779:ims-frontend-cloud-v1.0
 
-      - name: Print SSH key (debug)
-        run: |
-          echo "$DEPLOY_KEY"
-        env:
-          DEPLOY_KEY: ${{ secrets.deploy_key }}
-
       - name: SSH into manager node and deploy
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -45,4 +39,5 @@ jobs:
           key: ${{ secrets.deploy_key }}
           script: |
             cd ece1779
+            wget https://github.com/maahtami/ece1779/blob/master/docker-stack.yml -O docker-stack.yml
             docker stack deploy -c docker-stack.yml ims_stack
