@@ -13,10 +13,6 @@ jobs:
       - name: Log in to Docker Hub
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u peterthegreat1992 --password-stdin
 
-      - name: DEBUG POSTGRES VERSION
-        run: |
-          docker run --rm postgres:latest postgres --version
-
       - name: Build and push ims-db image
         run: |
           docker build -t ims-db:v1 ./infra/db
