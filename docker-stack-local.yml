@@ -10,7 +10,7 @@ services:
       - .env
     volumes:
       # Persistent data storage (Still needed for run-time data)
-      - ims_sw_data:/var/lib/postgresql/data
+      - ims_sw_data:/var/lib/postgresql
     networks:
       - app-network
     deploy:
