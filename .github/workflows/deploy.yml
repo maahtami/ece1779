@@ -39,5 +39,5 @@ jobs:
           key: ${{ secrets.deploy_key }}
           script: |
             cd ece1779
-            wget https://github.com/maahtami/ece1779/blob/master/docker-stack.yml -O docker-stack.yml
+            wget https://raw.githubusercontent.com/maahtami/ece1779/master/docker-stack.yml -O docker-stack.yml
             docker stack deploy -c docker-stack.yml ims_stack
