@@ -1,15 +1,38 @@
-# This workflow will connect to the DigitalOcean and create a snapshot of a volume.
-name: Create Volume Snapshot on DigitalOcean
+name: DigitalOcean Volume Backup Snapshot
+
 on:
+  # Triggers the workflow weekly at 03:00 UTC
+  schedule:
+    - cron: '0 3 * * 0'
+  # Allows to run the workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  create-snapshot:
+  create_volume_snapshot:
     runs-on: ubuntu-latest
+    
+    env:
+      # Replace with the actual ID of your DigitalOcean Volume
+      DO_VOLUME_ID: '05627211-c514-11f0-a7f7-0a58ac14ec3d' 
+      # Create a dynamic snapshot name with the current date/time
+      SNAPSHOT_NAME: "imsdbdata-auto-volume-snapshot-$(date +'%Y-%m-%d-%H%M')"
+
     steps:
-      - name: Create Volume Snapshot
+      - name: Install DigitalOcean CLI (doctl)
+        # Use a pre-built action to easily install doctl
         uses: digitalocean/action-doctl@v2
         with:
+          # This automatically configures doctl with your secret token
           token: ${{ secrets.DO_VOL_SNAP_ACCESS_TOKEN }}
-          # Name of the snapshot will be imsdbdata_<timestamp>
-          args: compute volume snapshot create "imsdbdata_$(date +%s)" --volume-id 05627211-c514-11f0-a7f7-0a58ac14ec3d --region TOR1
+
+      - name: Create Volume Snapshot
+        id: create
+        run: |
+          echo "Attempting to snapshot Volume ID: ${{ env.DO_VOLUME_ID }}"
+          
+          # doctl command to create the snapshot
+          doctl compute volume snapshot ${{ env.DO_VOLUME_ID }} \
+            --snapshot-name ${{ env.SNAPSHOT_NAME }} \
+            --format ID,Name,CreatedAt
+          
+          echo "Snapshot creation initiated."
