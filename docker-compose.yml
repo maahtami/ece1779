@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:latest
+    image: postgres:18.0
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       # persistent database files (local dev)
-      - ims_pg_data:/var/lib/postgresql/data
+      - ims_pg_data:/var/lib/postgresql
       # run schema files on first boot
       - ./infra/db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:

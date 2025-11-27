@@ -15,7 +15,7 @@ services:
       # for the externally attached DigitalOcean volume.
       - type: bind
         source: /mnt/imsdbdata # <--- ASSUMED MOUNT POINT OF DO VOLUME
-        target: /var/lib/postgresql/data # <--- PostgreSQL's internal data path
+        target: /var/lib/postgresql # <--- PostgreSQL's internal data path
     networks:
       - app-network
     deploy:
