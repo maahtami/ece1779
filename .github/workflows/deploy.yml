@@ -1,7 +1,11 @@
 name: Deploy to DigitalOcean Swarm
 
+
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - master
 
 jobs:
   deploy:
