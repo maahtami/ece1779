@@ -1,0 +1,15 @@
+# This workflow will connect to the DigitalOcean and create a snapshot of a volume.
+name: Create Volume Snapshot on DigitalOcean
+on:
+  workflow_dispatch:
+
+jobs:
+  create-snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Volume Snapshot
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_VOL_SNAP_ACCESS_TOKEN }}
+          # Name of the snapshot will be imsdbdata_<timestamp>
+          args: compute volume snapshot create "imsdbdata_$(date +%s)" --volume-id 05627211-c514-11f0-a7f7-0a58ac14ec3d --region TOR1
