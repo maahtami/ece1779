@@ -16,8 +16,9 @@
 6. [User Guide](#user-guide)
 7. [Development Guide](#development-guide)
 8. [Deployment Information](#deployment-information)
-9. [Individual Contributions](#individual-contributions)
-10. [Lessons Learned and Concluding Remarks](#lessons-learned-and-concluding-remarks)
+9. [Video Demo](#video-demo)
+10. [Individual Contributions](#individual-contributions)
+11. [Lessons Learned and Concluding Remarks](#lessons-learned-and-concluding-remarks)
 
 ---
 
@@ -25,9 +26,9 @@
 
 | Name | Student Number | Email | GitHub |
 |------|----------------|-------|--------|
-| Mohsen Miandashti | TBD | mmiandashti@gmail.com | [@maahtami](https://github.com/maahtami) |
-| Zhao Ji Wang | TBD | mikezerolol20@gmail.com | [@PeterKing1992](https://github.com/PeterKing1992) |
-| Tharun Seshachalam | TBD | tharun.seshachalam@outlook.com | [@tharunks](https://github.com/tharunks) |
+| Mahta Miandashti | 1010790770 | mahta.miandashti@mail.utoronto.ca | [@maahtami](https://github.com/maahtami) |
+| Zhao Ji Wang | 1005915529 | zhaoji.wang@mail.utoronto.ca | [@PeterKing1992](https://github.com/PeterKing1992) |
+| Tharun Seshachalam | 1010811383 | tharun.seshachalam@mail.utoronto.ca | [@tharunks](https://github.com/tharunks) |
 
 
 ---
@@ -113,7 +114,7 @@ The primary objectives of this project are:
 ### Infrastructure
 
 - **Cloud Provider**: DigitalOcean (IaaS)
-- **Compute**: 3 Droplets (Ubuntu 20.04)
+- **Compute**: 2 Droplets (Ubuntu 20.04)
   - 1 Manager Node
   - 1 Worker Node
 - **Storage**: DigitalOcean Block Storage Volume (mounted to manager node)
@@ -625,7 +626,7 @@ This section provides step-by-step instructions for using the Inventory Manageme
 
 ### Accessing the Application
 
-**Production URL**: http://159.203.33.61:3000
+**Production/Deployment URL**: http://159.203.33.61:3000
 
 ### User Roles
 
@@ -655,6 +656,9 @@ The system supports two user roles with different permissions:
 4. Click "Register" button
 5. New users are created with "staff" role by default
 
+![Registration Page](docs/images/register_staff_page.png)
+*Figure 2: Staff registration page*
+
 **Login**:
 1. Enter your username and password
 2. Click "Login" button
@@ -664,8 +668,8 @@ The system supports two user roles with different permissions:
 *Figure 1: Login page with username and password fields*
 
 **Default Admin Account**:
-- **Username**: admin
-- **Password**: admin123
+- **Username**: manager
+- **Password**: Credentials sent to TA
 - **Role**: manager
 
 #### 2. Dashboard Overview
@@ -676,6 +680,12 @@ The Dashboard serves as the main navigation hub with quick access cards:
 - **📊 Transactions**: Record and track stock movements
 - **👥 User Management** (Manager only): Create and manage staff accounts
 - **🏥 System Health Dashboard** (Manager only): Monitor system performance
+
+![Manager Dashboard](docs/images/manager_dashboard.png)
+*Figure 3: Manager dashboard with quick access cards*
+
+![Staff Dashboard](docs/images/staff_dashboard.png)
+*Figure 4: Staff dashboard view*
 
 #### 3. Managing Inventory Items
 
@@ -688,7 +698,10 @@ The Dashboard serves as the main navigation hub with quick access cards:
    - Price
    - Last updated timestamp
 
-**Creating a New Item** (Manager only):
+![Items Page](docs/images/items_page.png)
+*Figure 5: Inventory items list with actions*
+
+**Creating a New Item**:
 1. Navigate to Items page
 2. Click "Create New Item" button
 3. Fill in the form:
@@ -702,14 +715,14 @@ The Dashboard serves as the main navigation hub with quick access cards:
 5. Success notification appears
 6. New item appears in the list (real-time update via WebSocket)
 
-**Editing an Item** (Manager only):
+**Editing an Item**:
 1. Locate the item in the Items list
 2. Click "Edit" button for that item
 3. Modify desired fields
 4. Click "Update Item" button
 5. Changes are saved and broadcast to all users
 
-**Deleting an Item** (Manager only):
+**Deleting an Item**:
 1. Locate the item in the Items list
 2. Click "Delete" button
 3. Confirm deletion in the dialog
@@ -745,11 +758,17 @@ Transactions represent stock movements (incoming shipments or outgoing sales/usa
    - User who performed the transaction
    - Timestamp
 
+![Transactions Page](docs/images/transactions_page.png)
+*Figure 6: Transaction history with filters*
+
 **Low Stock Alerts**:
 - When an OUT transaction causes quantity to fall below threshold:
   - Real-time alert displayed to all connected users
   - Email notification sent to management
   - Alert shows item name, current quantity, and SKU
+
+![Low Stock Alert](docs/images/items_page_low_stock_alert.png)
+*Figure 7: Low stock alert banner on items page*
 
 #### 5. User Management (Manager Only)
 
@@ -761,6 +780,9 @@ Transactions represent stock movements (incoming shipments or outgoing sales/usa
    - Email address
    - Role (manager/staff)
    - Account creation date
+
+![Users Page](docs/images/users_page.png)
+*Figure 8: User management table for managers*
 
 **Creating a New User**:
 1. Click "Create New User" button
@@ -800,6 +822,9 @@ Transactions represent stock movements (incoming shipments or outgoing sales/usa
   - `ims_stack_api`: Backend API logs
   - `ims_stack_db`: Database logs
   - `ims_stack_frontend`: Frontend logs
+
+![System Health Dashboard](docs/images/health_page.png)
+*Figure 9: Health dashboard with metrics and logs*
 
 **Manual Refresh**:
 - Click "Refresh" button to update metrics immediately
@@ -859,7 +884,7 @@ git clone https://github.com/maahtami/ece1779.git
 cd ece1779
 ```
 
-#### 2. Environment Variables
+#### 2. Environment Variables (Credentials sent to TA)
 
 Create a `.env` file in the root directory with the following variables:
 
@@ -890,7 +915,7 @@ REACT_APP_API_URL=http://localhost:8000
 - Keep `.env` file out of version control (already in `.gitignore`)
 - Use strong passwords and API keys
 
-#### 3. Create `.env` for Serverless Function
+#### 3. Create `.env` for Serverless Function (Credentials sent to TA)
 
 Create `serverless/.env`:
 
@@ -1024,10 +1049,9 @@ docker stack rm ims_stack
 
 **1. Create Droplets**:
 
-Create three Ubuntu 20.04 droplets in DigitalOcean:
+Create two Ubuntu 20.04 droplets in DigitalOcean:
 - `ims-swarm-manager` (2GB RAM, 2 vCPUs)
 - `ims-swarm-worker-1` (2GB RAM, 2 vCPUs)
-- `ims-swarm-worker-2` (2GB RAM, 2 vCPUs)
 
 **2. Setup Manager Node**:
 
@@ -1053,7 +1077,7 @@ This script:
 
 **3. Setup Worker Nodes**:
 
-SSH into each worker droplet and run:
+SSH into worker droplet and run:
 
 ```bash
 chmod +x setup-worker.sh
@@ -1324,19 +1348,14 @@ docker service inspect ims_stack_api
 **Production URL**: http://159.203.33.61:3000
 
 **Default Admin Credentials**:
-- Username: `admin`
-- Password: `admin123`
-
-**Test Staff Account**:
-- Username: `staff1`
-- Password: `staff123`
+- Username: `manager`
+- Password: Credentials sent to TA
 
 ### Infrastructure
 
 **DigitalOcean Droplets**:
 - Manager Node: `ims-swarm-manager` (159.203.33.61)
 - Worker Node 1: `ims-swarm-worker-1`
-- Worker Node 2: `ims-swarm-worker-2`
 
 **Persistent Storage**:
 - DigitalOcean Volume: `imsdbdata` (50GB)
@@ -1441,6 +1460,12 @@ Database is constrained to manager node due to volume attachment. For high avail
 
 ---
 
+## Video Demo
+
+- Watch the demo on YouTube: https://www.youtube.com/watch?v=rndKv8Mxv6M
+
+---
+
 ## Individual Contributions
 
 ### Mohsen Miandashti ([@maahtami](https://github.com/maahtami))
@@ -1461,8 +1486,6 @@ Database is constrained to manager node due to volume attachment. For high avail
 - Implemented automated deployment pipeline
 - Set up weekly backup automation for database
 - Documented deployment procedures in `Deployment_Guide.md`
-
-**Git Commits**: Infrastructure, orchestration, deployment automation, and documentation commits
 
 ### Zhao Ji Wang ([@PeterKing1992](https://github.com/PeterKing1992))
 
@@ -1485,7 +1508,6 @@ Database is constrained to manager node due to volume attachment. For high avail
 - Integrated SendGrid email notifications via serverless function
 - Developed low-stock alert mechanism
 
-**Git Commits**: Backend API, database models, authentication, WebSocket, and business logic commits
 
 ### Tharun Seshachalam ([@tharunks](https://github.com/tharunks))
 
@@ -1509,7 +1531,6 @@ Database is constrained to manager node due to volume attachment. For high avail
 - Designed responsive CSS styling for all pages
 - Implemented role-based UI rendering (manager vs. staff views)
 
-**Git Commits**: Frontend components, UI/UX, WebSocket client, health dashboard, and styling commits
 
 ### Collaborative Work
 
@@ -1645,30 +1666,6 @@ System Health Dashboard required Docker socket access to retrieve service logs:
 - Experience with serverless computing models
 - Implementation of real-time communication protocols
 - DevOps practices including CI/CD and automation
-
-### Future Enhancements
-
-If we were to continue developing this project, we would consider:
-
-1. **Kubernetes Migration**: Migrate from Docker Swarm to Kubernetes for more advanced orchestration features and better ecosystem support.
-
-2. **Managed Database**: Use DigitalOcean Managed PostgreSQL for automated backups, replication, and maintenance.
-
-3. **API Gateway**: Implement an API gateway (e.g., Kong, Traefik) for better routing, rate limiting, and API management.
-
-4. **Observability Stack**: Deploy Prometheus + Grafana for comprehensive monitoring and alerting.
-
-5. **Caching Layer**: Add Redis for session management and caching frequently accessed data.
-
-6. **Advanced Authentication**: Implement OAuth2/OIDC for single sign-on and social login.
-
-7. **Mobile Application**: Develop native mobile apps for iOS and Android.
-
-8. **Analytics Dashboard**: Add business intelligence features for inventory trends and forecasting.
-
-9. **Multi-Tenancy**: Support multiple organizations with data isolation.
-
-10. **Internationalization**: Support multiple languages and currencies.
 
 ### Concluding Thoughts
 
