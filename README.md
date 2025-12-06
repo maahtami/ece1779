@@ -1507,6 +1507,7 @@ Database is constrained to manager node due to volume attachment. For high avail
 - Implemented transaction validation and stock management logic
 - Integrated SendGrid email notifications via serverless function
 - Developed low-stock alert mechanism
+- CI/CD implementation
 
 
 ### Tharun Seshachalam ([@tharunks](https://github.com/tharunks))
